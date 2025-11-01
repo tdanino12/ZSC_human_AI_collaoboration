@@ -64,9 +64,15 @@ Please cite
 1. Network model:
    when starting the training by calling the file "pbt/pbt_model_pool.py" the following steps are taken to call the model:
    
-   a. In "human_aware_rl/human_aware_rl/pbt/pbt_model_pool.py" in line 48 the function "create_model_context" is called, the import of "create_model_context" is done in line 26 "from human_aware_rl.baselines_utils import create_model,create_model_context".
+   a. In "human_aware_rl/human_aware_rl/pbt/pbt_model_pool.py" in line 48 the function "create_model_context" is called and returns self.model. The import of "create_model_context" is done in line 26 "from human_aware_rl.baselines_utils import create_model,create_model_context".
    
    b. The "create_model_context" function is in the file "human_aware_rl/human_aware_rl
-/baselines_utils.py", it calls the "learn_context" function in line 460, which returns a modeel. The "learn_context" is being imported in line 17: "from baselines.ppo2_context.ppo2 import learn as learn_context"
+/baselines_utils.py", it calls the "learn_context" function in line 460, which returns a model. The "learn_context" is being imported in line 17: "from baselines.ppo2_context.ppo2 import learn as learn_context"
 
-c. The "learn_context" function
+c. The "learn_context" function is in "human_aware_rl/baselines/baselines/ppo2_context
+/ppo2.py". In line 113, we call: "model = model_fn". model_fn is imported in line 110-110 in 
+
+from baselines.ppo2_context.model import Model
+model_fn = Model
+
+d. 
