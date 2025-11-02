@@ -184,7 +184,7 @@ class PolicyWithValue_context(object):
     
         for i in range(num_experts):
             with tf.variable_scope(f"expert_{i}"):
-                pd, pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)
+                pd, pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)  # Calls "pdfromlatent" in the function "make_pdtype". Then, calls "_matching_fc" which creates FC layer.
                 self.expert_pds.append(pd)
                 self.expert_actions.append(pd.sample())
                 self.expert_action_probs.append(pd.mean)
@@ -387,6 +387,7 @@ def _normalize_clip_observation(x, clip_range=[-5.0, 5.0]):
     rms = RunningMeanStd(shape=x.shape[1:])
     norm_x = tf.clip_by_value((x - rms.mean) / rms.std, min(clip_range), max(clip_range))
     return norm_x, rms
+
 
 
 
