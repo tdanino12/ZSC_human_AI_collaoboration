@@ -70,9 +70,23 @@ Please cite
 /baselines_utils.py", it calls the "learn_context" function in line 460, which returns a model. The "learn_context" is being imported in line 17: "from baselines.ppo2_context.ppo2 import learn as learn_context"
 
 c. The "learn_context" function is in "human_aware_rl/baselines/baselines/ppo2_context
-/ppo2.py". In line 113, we call: "model = model_fn". model_fn is imported in line 110-110 in 
+/ppo2.py". In line 113, we call: "model = model_fn(policy=policy ... )". model_fn is imported in line 110-110 in 
 
 from baselines.ppo2_context.model import Model
+
 model_fn = Model
 
-d. 
+The policy in the model_fn funciton signature is the the actual model. It is created in line 94:
+
+policy = build_policy(env, network, use_context=True,**network_kwargs)
+
+and being imported in line 9:
+
+from baselines.common.policies import build_policy
+
+d. The "build_policy" function is in the file:
+
+human_aware_rl/baselines/baselines/common
+/policies.py
+
+
