@@ -221,7 +221,8 @@ class PolicyWithValue_context(object):
         
         ###############################################################################################
 
-        
+        '''
+        ###### this part of the code i being replaced: ######
         # Actions probs
         action_probs = self.pd.mean
         self.action_probs = tf.identity(action_probs, name="action_probs")
@@ -233,7 +234,8 @@ class PolicyWithValue_context(object):
         # Calculate the neg log of our probability
         self.neglogp = self.pd.neglogp(self.action)
         self.sess = sess or tf.get_default_session()
-
+        '''
+        
         if estimate_q:
             assert isinstance(env.action_space, gym.spaces.Discrete)
             self.q = fc(vf_latent, 'q', env.action_space.n)
@@ -385,6 +387,7 @@ def _normalize_clip_observation(x, clip_range=[-5.0, 5.0]):
     rms = RunningMeanStd(shape=x.shape[1:])
     norm_x = tf.clip_by_value((x - rms.mean) / rms.std, min(clip_range), max(clip_range))
     return norm_x, rms
+
 
 
 
