@@ -165,8 +165,6 @@ class PolicyWithValue_context(object):
         # Based on the action space, will select what probability distribution type
         self.pdtype = make_pdtype(env.action_space)
 
-        self.pd, self.pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)
-
         ###############################################################################################
         # --- Routing network ---
         with tf.variable_scope("routing"):
@@ -223,6 +221,8 @@ class PolicyWithValue_context(object):
 
         '''
         ###### this part of the code i being replaced: ######
+        
+        self.pd, self.pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)
         # Actions probs
         action_probs = self.pd.mean
         self.action_probs = tf.identity(action_probs, name="action_probs")
@@ -387,6 +387,7 @@ def _normalize_clip_observation(x, clip_range=[-5.0, 5.0]):
     rms = RunningMeanStd(shape=x.shape[1:])
     norm_x = tf.clip_by_value((x - rms.mean) / rms.std, min(clip_range), max(clip_range))
     return norm_x, rms
+
 
 
 
