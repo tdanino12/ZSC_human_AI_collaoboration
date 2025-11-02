@@ -61,6 +61,9 @@ Please cite
  ```
 
 ##################################################################################
+
+Code workflow for creating the network model:
+
 1. Network model:
    when starting the training by calling the file "pbt/pbt_model_pool.py" the following steps are taken to call the model:
    
@@ -89,4 +92,10 @@ d. The "build_policy" function is in the file:
 human_aware_rl/baselines/baselines/common
 /policies.py
 
+##################################################################################
 
+Files changed:
+
+1. In the file "human_aware_rl/baselines/baselines/common
+/policies.py" we changed the "PolicyWithValue_context" function (line 130)
+and added instead of the regular policy a mixture of experts with a routing network.
