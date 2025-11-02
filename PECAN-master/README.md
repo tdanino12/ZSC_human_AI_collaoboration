@@ -99,3 +99,5 @@ Files changed:
 1. In the file "human_aware_rl/baselines/baselines/common
 /policies.py" we changed the "PolicyWithValue_context" function (line 130)
 and added instead of the regular policy a mixture of experts with a routing network.
+
+Changes are between line 168 and 220.
