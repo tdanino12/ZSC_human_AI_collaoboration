@@ -167,6 +167,61 @@ class PolicyWithValue_context(object):
 
         self.pd, self.pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)
 
+        ###############################################################################################
+        # --- Routing network ---
+        with tf.variable_scope("routing"):
+            # Uses both latent and context to decide expert weights
+            routing_logits = tf.layers.dense(
+                tf.concat([latent, context], axis=-1),
+                num_experts,
+                activation=None,
+                name="routing_logits")
+            self.routing_weights = tf.nn.softmax(routing_logits, axis=-1, name="routing_weights")
+
+
+        # --- Build identical experts ---
+        self.expert_pds = []
+        self.expert_actions = []
+        self.expert_action_probs = []
+    
+        for i in range(num_experts):
+            with tf.variable_scope(f"expert_{i}"):
+                pd, pi = self.pdtype.pdfromlatent(latent, init_scale=0.01)
+                self.expert_pds.append(pd)
+                self.expert_actions.append(pd.sample())
+                self.expert_action_probs.append(pd.mean)
+
+        # --- Select the expert with the highest routing weight ---
+        self.selected_expert_idx = tf.argmax(self.routing_weights, axis=-1, output_type=tf.int32)
+        batch_indices = tf.stack([tf.range(tf.shape(self.selected_expert_idx)[0]),
+                                  self.selected_expert_idx], axis=1)
+    
+        # === Replacement for old lines ===
+        # # Actions probs
+        # action_probs = self.pd.mean
+        # self.action_probs = tf.identity(action_probs, name="action_probs")
+        self.action_probs = tf.gather_nd(tf.stack(self.expert_action_probs, axis=1), batch_indices)
+    
+        # # Take an action
+        # action = self.pd.sample()
+        # self.action = tf.identity(action, name="action")
+        self.action = tf.gather_nd(tf.stack(self.expert_actions, axis=1), batch_indices)
+    
+        # # Calculate the neg log of our probability
+        # self.neglogp = self.pd.neglogp(self.action)
+        neglogp_all = tf.stack([pd.neglogp(self.action) for pd in self.expert_pds], axis=1)
+        self.neglogp = tf.gather_nd(neglogp_all, batch_indices)
+    
+        # # self.sess = sess or tf.get_default_session()
+        self.sess = sess or tf.get_default_session()
+        # ==============================================================
+        # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+        # >>>> END OF REPLACEMENT
+        # ==============================================================
+        
+        ###############################################################################################
+
+        
         # Actions probs
         action_probs = self.pd.mean
         self.action_probs = tf.identity(action_probs, name="action_probs")
@@ -330,5 +385,6 @@ def _normalize_clip_observation(x, clip_range=[-5.0, 5.0]):
     rms = RunningMeanStd(shape=x.shape[1:])
     norm_x = tf.clip_by_value((x - rms.mean) / rms.std, min(clip_range), max(clip_range))
     return norm_x, rms
+
 
 
